@@ -19,7 +19,6 @@ let clock,
   pointLight,
   animateParams;
 let elapsedTime = 0;
-let aroundSunDirection = 1;
 
 /* Denne funktioner exporteres. Dette betyder den kan bruges i flere javascript filer.
 Denne her funktion går blot ind i scenen, og slår synligheden for alle dens children til / fra.
@@ -224,9 +223,9 @@ export function initScene() {
     earthSpeed: 10,
     earthRotationSpeed: 1,
     lightIntensity: 50,
+    aroundSunDirection: 1,
     rotationDirection: () => {
-      aroundSunDirection =
-        aroundSunDirection *
+      animateParams.aroundSunDirection *=
         -1; /* dette er blandt andet retningen som enten er -1 eller 1. */
     },
   };
@@ -251,7 +250,7 @@ export function updateScene() {
   const deltaTime = clock.getDelta();
   /* Opdaterer den samlede tid baseret på hastighed og rotationsretning. Dette gør skift i hastighed og rotationretning
 til at blive vist på en mere realistisk måde */
-  elapsedTime += deltaTime * mappedSpeed * aroundSunDirection;
+  elapsedTime += deltaTime * mappedSpeed * animateParams.aroundSunDirection;
   /* Mapper lightIntensity fra 1-100 til 1-1000 og afrunder til heltal. */
   const mappedLight = Math.round(
     ((animateParams.lightIntensity - 1) * (1000 - 1)) / (100 - 1) + 1
@@ -281,7 +280,7 @@ til at blive vist på en mere realistisk måde */
   }
   const rotationLabel = earthLabelElement.querySelector(".rotation");
   if (rotationLabel) {
-    rotationLabel.innerText = `Rotation Sol: ${aroundSunDirection}`;
+    rotationLabel.innerText = `Rotation Sol: ${animateParams.aroundSunDirection}`;
   }
 
   /* Her ændrer vi solens matriale farve baseres på vores udregnede r og g værdier. */

@@ -55,14 +55,14 @@ export function initGUI(params, musicParams, getPlayer) {
 }
 
 /* Denne funktion bruges til at sætte værdierne af hvert slider og knap manuelt. Dette bruges blandt andet til at loade presets */
-export function setValues(presetParams, songs) {
+export function setValues(presetParams, songs, animateparams) {
   /* Tager udgangspunkt i den preset object den får */
   const songNum = presetParams.songNum;
+  animateparams.aroundSunDirection = presetParams.rotationDirection;
   /* sætter alle værdier af de forskellige GUI til værdierne fra preset params objektet. */
   controllers.earthSpeed.setValue(presetParams.earthSpeed);
   controllers.earthRotationSpeed.setValue(presetParams.earthRotationSpeed);
   controllers.lightIntensity.setValue(presetParams.lightIntensity);
-  controllers.rotationDirection.setValue(presetParams.rotationDirection);
   controllers.volume.setValue(presetParams.volume);
   /* denne parameter er ikke i min gui, men da den skal sættes sammen med de andre sættes den her */
   /* Dette ser hvilken music video bør afspilles, på basis ad den preset der lige er blevet åbnet.

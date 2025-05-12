@@ -60,7 +60,8 @@ fetch("static/testJSON/presets.json")
         /* Denne div for en evenlistener, som så lytter efter clicks på den. */
         setValues(
           preset,
-          songs
+          songs,
+          animateParams
         ); /* Hvis der opleves click, kaldes setvalue funktionen og alle værdier inden for webside ændres baseret på preseten*/
         toggleEverything(); /* Nu lukkes pop upet ned, så vi kan se vores scene igen */
       });
