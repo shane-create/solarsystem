@@ -5,6 +5,8 @@ import {
   CSS2DObject,
 } from "three/addons/renderers/CSS2DRenderer.js";
 
+const base = import.meta.env.BASE_URL;
+
 /* Dette er min fil der arbejder med three.js. Three js er en javascript library der 
 kommer med en masse pre-lavede funktioner, som man så kan bruge til at lave 3D objekter med */
 
@@ -103,18 +105,18 @@ export function initScene() {
   /* Her loader vi vores textures. Vi gør brug af vores texture loader, som kun indtager en filsti til den textur vi vil 
   loade. */
   const earth_albedo = textureLoader.load(
-    "static/textures/earthTexture/earth_albedo.jpg"
+    base + "static/textures/earthTexture/earth_albedo.jpg"
   );
   const earth_normal = textureLoader.load(
-    "static/textures/earthTexture/earth_normal.png"
+    base + "static/textures/earthTexture/earth_normal.png"
   );
 
   const cloud_albedo = textureLoader.load(
-    "static/textures/earthTexture/cloud_base.jpg"
+    base + "static/textures/earthTexture/cloud_base.jpg"
   );
 
   const cloud_alpha = textureLoader.load(
-    "static/textures/earthTexture/cloud_alpha.png"
+    base + "static/textures/earthTexture/cloud_alpha.png"
   );
 
   const sun_albedo = textureLoader.load("static/textures/sunTexture/sun.jpg");
@@ -123,12 +125,12 @@ export function initScene() {
    en for hver af de seks sider af en terning. Når disse billeder bruges som en tekstur, giver de en 3D effekt, 
    hvor objekter ser ud som om de er omgivet af en himmel eller et miljø som hvis de var inde i en terning. */
   const background_cubemap = cubeTextureLoader.load([
-    "static/textures/backgroundTexture/bgCube/px.png",
-    "static/textures/backgroundTexture/bgCube/nx.png",
-    "static/textures/backgroundTexture/bgCube/py.png",
-    "static/textures/backgroundTexture/bgCube/ny.png",
-    "static/textures/backgroundTexture/bgCube/pz.png",
-    "static/textures/backgroundTexture/bgCube/nz.png",
+    base + "static/textures/backgroundTexture/bgCube/px.png",
+    base + "static/textures/backgroundTexture/bgCube/nx.png",
+    base + "static/textures/backgroundTexture/bgCube/py.png",
+    base + "static/textures/backgroundTexture/bgCube/ny.png",
+    base + "static/textures/backgroundTexture/bgCube/pz.png",
+    base + "static/textures/backgroundTexture/bgCube/nz.png",
   ]);
 
   /* Vi sætter scenens baggrund til denne cubemap */

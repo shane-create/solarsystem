@@ -1,14 +1,21 @@
+import "./style.css";
+import "./vanilla.js";
+import "./three.js";
+import "./firebase.js";
+import "./dataSave.js";
 import { initScene, updateScene, toggleVisible } from "./three.js";
-import { initGUI, toggleGUI, setValues } from "./gui.js";
+import { fetchData, savePreset, savedPresets } from "./dataSave.js";
+import { initMQTT, url } from "./mqttClient.js";
 import {
-  musicInit,
-  getPlayer,
   toggleMenu,
-  songs,
   togglePopUp,
   inputValue,
-  song,
+  audioElement,
+  key,
+  loadSong,
+  setKey,
 } from "./vanilla.js";
+const base = import.meta.env.BASE_URL;
 
 /* Oven over, henter vi alle funktioner og variabler der eksporteres fra de forskellige javascript filer */
 
@@ -23,14 +30,11 @@ const { scene, camera, renderer, labelRenderer, controls, animateParams } =
   initScene();
 
 /* Vi initialiserer også vores youtube player */
-const musicParams = musicInit();
-
-/* Her laves en tom array til de presets vi kommer til at hente */
-let presets = [];
+/*const musicParams = musicInit();*/
 
 /* Vi initialiserer også vores GUI, og giver den blandt andet vores player, vores musicobjekt og vores animateobjekt.
 Dette er blot værdier som vi vil vise med vores GUI*/
-initGUI(animateParams, musicParams, getPlayer);
+initMQTT(url, animateParams);
 
 /* En variabel af om objekter er synlige */
 let objectsVisible = true;
@@ -41,40 +45,22 @@ function toggleEverything() {
   objectsVisible = !objectsVisible;
   toggleMenu();
   toggleVisible(scene, objectsVisible);
-  toggleGUI(objectsVisible);
 }
 
-/* Her henter vi vores json presets fil */
-fetch("static/testJSON/presets.json")
-  .then((response) =>
-    response.json()
-  ) /* ud fra den response vi får, kovneterer vi det objekt til json. */
-  .then((data) => {
-    /* og af den json behandler vi dataen */
-    presets =
-      data.presets; /* Vores presets array bliver alt der er inde i presets keyen, som er en array af objects */
-    presets.forEach((preset) => {
-      /* For hver preset objekt laver vi en ny div */
-      const newElm = document.createElement("div");
-      newElm.addEventListener("click", () => {
-        /* Denne div for en evenlistener, som så lytter efter clicks på den. */
-        setValues(
-          preset,
-          songs,
-          animateParams
-        ); /* Hvis der opleves click, kaldes setvalue funktionen og alle værdier inden for webside ændres baseret på preseten*/
-        toggleEverything(); /* Nu lukkes pop upet ned, så vi kan se vores scene igen */
-      });
-      /* Hvert preset div får classen preset, såvel som en p tag inden i, der kun viser presetens navn */
-      newElm.className = "preset";
-      newElm.innerHTML = `<p>${preset.name}</p>`;
-      /* Hvert preset div tilføjes til en presetcontainer div inde i htmlen. */
-      presetsContainer.appendChild(newElm);
+function loadPresets() {
+  presetsContainer.innerHTML = "";
+  savedPresets.forEach((preset) => {
+    const newElm = document.createElement("div");
+    newElm.addEventListener("click", () => {
+      setKey(preset.key);
+      loadSong();
+      toggleEverything();
     });
-  })
-  .catch((error) =>
-    console.error("Presets could not be loaded:", error)
-  ); /* Hvis der er en error, når den prøver loade presets console.logger den erorren */
+    newElm.className = "preset";
+    newElm.innerHTML = `<p>${preset.name}</p>`;
+    presetsContainer.appendChild(newElm);
+  });
+}
 
 /* Denne eventlistener lytter efter, når brugere ændrer vinduets større. HVis dette sker, vil vi gerne have 
 at begge renderers ændrer størrelse, og kameraes forhold også ændres */
@@ -85,25 +71,31 @@ window.addEventListener("resize", () => {
   labelRenderer.setSize(window.innerWidth, window.innerHeight);
 });
 
+document.addEventListener("DOMContentLoaded", async () => {
+  await fetchData();
+  loadPresets();
+  console.log("loaded");
+});
+
 /* Her tilføjer vi en eventlistener til saveknappen. Den skal i virkeligheden kunne gemme dette data på firebase,
 men det er del af en anden gruppe medlems kode. */
-saveButton.addEventListener("click", () => {
+saveButton.addEventListener("click", async () => {
   /* Hvis inputen har en værdi, laver den en savedpreset objekt. Den har alle værdierne der skal gemme. */
   if (inputValue.length > 0) {
-    const savedPreset = {
-      name: inputValue,
-      volume: musicParams.volume,
-      songNum: song ? song.num : 1,
-      earthSpeed: animateParams.earthSpeed,
-      earthRotationSpeed: animateParams.earthRotationSpeed,
-      lightIntensity: animateParams.lightIntensity,
-      rotationDirection: animateParams.rotationDirection,
-    };
-    /* Da jeg ikk kan gemme den lige nu, console.logger jeg den istedet. */
-    console.log(savedPreset);
+    await savePreset(
+      inputValue,
+      animateParams.volume,
+      key,
+      animateParams.earthSpeed,
+      animateParams.earthRotationSpeed,
+      animateParams.lightIntensity,
+      animateParams.aroundSunDirection
+    );
+    await fetchData();
     /* Inputens værdi sættes til tom. */
     inputField.value = "";
     /* Og vi lukker for alle pop ups så vi kan se vores scene */
+    loadPresets();
     togglePopUp();
     toggleEverything();
   } else {
@@ -120,7 +112,7 @@ hamburgerWrapper.addEventListener("click", () => {
 });
 
 /* Hvis addbutton klikkes på, skal en ny pop up blive synlig. Klikkes igen sker det modsatte*/
-addButton.addEventListener("click", () => {
+addButton.addEventListener("click", async () => {
   togglePopUp();
 });
 

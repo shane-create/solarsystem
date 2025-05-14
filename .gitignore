@@ -1,3 +1,6 @@
+# Firebase API key (do NOT commit)
+src/key.js
+
 # Logs
 logs
 *.log
