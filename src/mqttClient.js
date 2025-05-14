@@ -2,7 +2,7 @@ import mqtt from "mqtt";
 import { setKey, key, loadSong } from "./vanilla";
 
 let client = null;
-export const url = "ws://mqtt-plain.nextservices.dk:9001/mqtt";
+export const url = "mqtt://mqtt-plain.nextservices.dk:9001";
 let sunOn = true;
 
 export function initMQTT(url, animateParams) {
@@ -38,66 +38,83 @@ export function initMQTT(url, animateParams) {
 }
 
 function handleInterface(r, animateParams) {
-  const { componentType } = r;
-  switch (componentType) {
-    case "Knob":
-      handleKnob(r, animateParams);
-      break;
-    case "Toggle":
-      handleToggle(r, animateParams);
-      break;
-    case "Button":
-      handleButton(r);
-      break;
-    default:
-      console.log("Invalid response");
+  if (r.ComponentType == "Knob") {
+    handleKnob(r, animateParams);
+  } else if (r.ComponentType == "Toggle") {
+    handleToggle(r, animateParams);
+  } else if (r.ComponentType == "Button") {
+    handleButton();
   }
 }
 
-function handleKnob(r, params) {
-  const { ID, Direction } = r;
-
-  const increment = Direction === 1 ? 10 : -10;
-
-  switch (ID) {
-    case 1:
-      if (sunOn) {
-        params.lightIntensity = clampWrap(
-          params.lightIntensity + increment,
-          10,
-          100
-        );
+function handleKnob(r, animateParams) {
+  if (r.ID == 1) {
+    if (sunOn) {
+      if (r.Direction == 1) {
+        if (animateParams.lightIntensity < 100) {
+          animateParams.lightIntensity += 10;
+        } else {
+          animateParams.lightIntensity = 10;
+        }
+      } else {
+        if (animateParams.lightIntensity > 10) {
+          animateParams.lightIntensity -= 10;
+        } else {
+          animateParams.lightIntensity = 100;
+        }
       }
-      break;
-
-    case 2:
-      params.earthSpeed = clamp(params.earthSpeed + increment, 10, 100);
-      break;
-
-    case 3: // Change song key
-      const newKey = wrap(key + increment / 10, 1, 5);
-      setKey(newKey);
-      loadSong();
-      break;
-
-    case 4:
-    case 5:
-      console.log(`ℹ️ No handler for Knob ID ${ID}`);
-      break;
+    }
+  }
+  if (r.ID == 2) {
+    if (r.Direction == 1) {
+      if (animateParams.earthSpeed < 100) {
+        animateParams.earthSpeed += 10;
+      }
+    } else {
+      if (animateParams.earthSpeed > 10) {
+        animateParams.earthSpeed -= 10;
+      }
+    }
+  }
+  if (r.ID == 3) {
+    if (r.Direction == 1) {
+      if (key < 5) {
+        setKey(key + 1);
+        loadSong();
+      } else {
+        setKey(1);
+        loadSong();
+      }
+    } else {
+      if (key > 1) {
+        setKey(key - 1);
+        loadSong();
+      } else {
+        setKey(5);
+        loadSong();
+      }
+    }
+  }
+  if (r.ID == 4) {
+    console.log("Not here either");
+  }
+  if (r.ID == 5) {
+    console.log("Yea, theres nothin here right now");
   }
 }
+
 function handleToggle(r, animateParams) {
-  const { ID } = r;
-  switch (ID) {
-    case 1:
-      animateParams.aroundSunDirection *= -1;
-      break;
-    case 2:
+  if (r.ID == 1) {
+    animateParams.aroundSunDirection *= -1;
+  }
+  if (r.ID == 2) {
+    if (sunOn) {
+      animateParams.lightIntensity = 0;
       sunOn = !sunOn;
-      params.lightIntensity = sunOn ? 10 : 0;
-      break;
-    default:
-      console.log("Improper input");
+    } else {
+      animateParams.lightIntensity = 10;
+      sunOn = !sunOn;
+    }
   }
 }
 
@@ -112,19 +129,4 @@ function handleButton(message) {
       else console.log("▶️ Motor command sent");
     }
   );
-}
-
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
-}
-
-function wrap(value, min, max) {
-  const range = max - min + 1;
-  return ((value - min + range) % range) + min;
-}
-
-function clampWrap(value, min, max) {
-  if (value > max) return min;
-  if (value < min) return max;
-  return value;
 }
