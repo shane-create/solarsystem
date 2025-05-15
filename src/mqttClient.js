@@ -102,14 +102,10 @@ function handleKnob(r, animateParams) {
     if (r.Direction == 1) {
       if (bri < 200) {
         bri += 10;
-      } else {
-        bri = 30;
       }
     } else {
       if (bri > 30) {
         bri -= 10;
-      } else {
-        bri = 200;
       }
     }
   }
