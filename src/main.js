@@ -3,7 +3,6 @@ import "./vanilla.js";
 import "./three.js";
 import "./firebase.js";
 import "./dataSave.js";
-import { initGUI } from "./gui.js";
 import { initScene, updateScene, toggleVisible } from "./three.js";
 import { fetchData, savePreset, savedPresets } from "./dataSave.js";
 import { initMQTT, url } from "./mqttClient.js";

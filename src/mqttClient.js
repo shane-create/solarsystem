@@ -7,6 +7,7 @@ let sunOn = true;
 let client = null;
 let bri = 150;
 let col = 0;
+const songNum = document.querySelector(".sang-num");
 
 export function initMQTT(url, animateParams) {
   if (client) return client;
@@ -46,7 +47,7 @@ function handleInterface(r, animateParams) {
   } else if (r.ComponentType == "Toggle") {
     handleToggle(r, animateParams);
   } else if (r.ComponentType == "Button") {
-    handleButton();
+    handleButton(r, animateParams);
   }
 }
 
@@ -83,18 +84,18 @@ function handleKnob(r, animateParams) {
     if (r.Direction == 1) {
       if (key < 5) {
         setKey(key + 1);
-        loadSong();
+        songNum.innerHTML = "Ambient Song: " + key;
       } else {
         setKey(1);
-        loadSong();
+        songNum.innerHTML = "Ambient Song: " + key;
       }
     } else {
       if (key > 1) {
         setKey(key - 1);
-        loadSong();
+        songNum.innerHTML = "Ambient Song: " + key;
       } else {
         setKey(5);
-        loadSong();
+        songNum.innerHTML = "Ambient Song: " + key;
       }
     }
   }
@@ -139,7 +140,7 @@ function handleToggle(r, animateParams) {
   }
 }
 
-function handleButton(message) {
+function handleButton(message, animateParams) {
   const { r, g, b } = currentRGB;
   const xy = rgbToXy(r, g, b);
 
@@ -150,13 +151,18 @@ function handleButton(message) {
     colormode: "xy",
   };
 
-  console.log(bri);
+  const secondLight = {
+    xy: [0.3127, 0.329],
+    colormode: "xy",
+    bri: animateParams.lightIntensity,
+    on: true,
+  };
 
-  console.log("▶️ RGB:", currentRGB, "→ XY:", xy);
-  console.log("Sending to light API...");
+  loadSong();
 
   // Send to Hue Hub
-  setLight(lightPayload, "state");
+  setLight(lightPayload, "state", 13);
+  setLight(secondLight, "state", 2);
   /*const msg = message;
   client.publish(
     "ESPStepper1/Motor",

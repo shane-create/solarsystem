@@ -1,7 +1,6 @@
 var ip = "10.78.16.62";
 var username = "pAEzbkQouu3gf1UwgpNFM4TGBmU038Hd3vXCF2Vy";
-let myLight = 13;
-let url = "http://" + ip + "/api/" + username + "/lights/" + myLight;
+let url = "http://" + ip + "/api/" + username + "/lights/";
 
 export let currentRGB = { r: 0, g: 0, b: 0 };
 
@@ -26,8 +25,8 @@ export function rgbToXy(r, g, b) {
 }
 
 // Send update to Philips Hue
-export function setLight(data, command) {
-  const path = `${url}/${command}`;
+export function setLight(data, command, lightNum) {
+  const path = `${url + lightNum}/${command}`;
   const content = JSON.stringify(data);
 
   fetch(path, {
