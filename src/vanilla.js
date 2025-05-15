@@ -52,6 +52,12 @@ export function loadSong() {
   );
 }
 
+export function setValues(presetParams, animateParams) {
+  animateParams.aroundSunDirection = presetParams.rotationDirection;
+  animateParams.earthSpeed = presetParams.earthSpeed;
+  animateParams.lightIntensity = presetParams.lightIntensity;
+}
+
 export function setKey(newKey) {
   key = newKey;
 }

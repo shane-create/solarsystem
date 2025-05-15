@@ -1,9 +1,12 @@
 import mqtt from "mqtt";
 import { setKey, key, loadSong } from "./vanilla";
+import { currentRGB, rgbToXy, setLight, changeGradCol } from "./phillipsHue";
 
-let client = null;
 export const url = "mqtt://mqtt-plain.nextservices.dk:9001";
 let sunOn = true;
+let client = null;
+let bri = 150;
+let col = 0;
 
 export function initMQTT(url, animateParams) {
   if (client) return client;
@@ -96,10 +99,32 @@ function handleKnob(r, animateParams) {
     }
   }
   if (r.ID == 4) {
-    console.log("Not here either");
+    if (r.Direction == 1) {
+      if (bri < 200) {
+        bri += 10;
+      } else {
+        bri = 30;
+      }
+    } else {
+      if (bri > 30) {
+        bri -= 10;
+      } else {
+        bri = 200;
+      }
+    }
   }
   if (r.ID == 5) {
-    console.log("Yea, theres nothin here right now");
+    if (r.Direction == 1) {
+      if (col < 100) {
+        col += 1;
+        changeGradCol(col);
+      }
+    } else {
+      if (col > 0) {
+        col -= 1;
+        changeGradCol(col);
+      }
+    }
   }
 }
 
@@ -119,7 +144,24 @@ function handleToggle(r, animateParams) {
 }
 
 function handleButton(message) {
-  const msg = message;
+  const { r, g, b } = currentRGB;
+  const xy = rgbToXy(r, g, b);
+
+  const lightPayload = {
+    on: true,
+    xy,
+    bri,
+    colormode: "xy",
+  };
+
+  console.log(bri);
+
+  console.log("▶️ RGB:", currentRGB, "→ XY:", xy);
+  console.log("Sending to light API...");
+
+  // Send to Hue Hub
+  setLight(lightPayload, "state");
+  /*const msg = message;
   client.publish(
     "ESPStepper1/Motor",
     JSON.stringify(msg),
@@ -128,5 +170,5 @@ function handleButton(message) {
       if (err) console.error("Publish error:", err);
       else console.log("▶️ Motor command sent");
     }
-  );
+  );*/
 }

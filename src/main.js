@@ -3,6 +3,7 @@ import "./vanilla.js";
 import "./three.js";
 import "./firebase.js";
 import "./dataSave.js";
+import { initGUI } from "./gui.js";
 import { initScene, updateScene, toggleVisible } from "./three.js";
 import { fetchData, savePreset, savedPresets } from "./dataSave.js";
 import { initMQTT, url } from "./mqttClient.js";
@@ -10,10 +11,10 @@ import {
   toggleMenu,
   togglePopUp,
   inputValue,
-  audioElement,
   key,
   loadSong,
   setKey,
+  setValues,
 } from "./vanilla.js";
 const base = import.meta.env.BASE_URL;
 
@@ -32,8 +33,6 @@ const { scene, camera, renderer, labelRenderer, controls, animateParams } =
 /* Vi initialiserer også vores youtube player */
 /*const musicParams = musicInit();*/
 
-/* Vi initialiserer også vores GUI, og giver den blandt andet vores player, vores musicobjekt og vores animateobjekt.
-Dette er blot værdier som vi vil vise med vores GUI*/
 initMQTT(url, animateParams);
 
 /* En variabel af om objekter er synlige */
@@ -52,8 +51,9 @@ function loadPresets() {
   savedPresets.forEach((preset) => {
     const newElm = document.createElement("div");
     newElm.addEventListener("click", () => {
-      setKey(preset.key);
+      setKey(preset.songNum);
       loadSong();
+      setValues(preset, animateParams);
       toggleEverything();
     });
     newElm.className = "preset";

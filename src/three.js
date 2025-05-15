@@ -47,7 +47,7 @@ export function initScene() {
   /* Her laves der 2 div elementer. De får hver en class, såvel som noget html. Disse bruges som labels senere */
   earthLabelElement = document.createElement("div");
   earthLabelElement.className = "earth-label";
-  earthLabelElement.innerHTML = `<p class="hastighed">Hastighed:10</p><p class="selv-hastighed">Hastighed Selv:1</p><p class="rotation">rotation sol:1</p>`;
+  earthLabelElement.innerHTML = `<p class="hastighed">Hastighed:10</p><p class="rotation">rotation sol:1</p>`;
   sunLabelElement = document.createElement("div");
   sunLabelElement.className = "sun-label";
   sunLabelElement.innerHTML = "<p class='lys'>lystyrke:10%</p>";
@@ -188,7 +188,7 @@ export function initScene() {
   Da de tilføjes til en objekt og ikke scenen, vil deres position være i forhold til positionen af den objekt de
   er børn af. Vi kan derfor nøjes med blot at ændre y positionen, da vi gerne vil have at disse labels er lidt højere
   end vores objekter. Vi vil ikke have at de blokerer for objektet. */
-  earthLabelObject.position.set(0, 3.5, 0);
+  earthLabelObject.position.set(0, 2.5, 0);
   earthMesh.add(earthLabelObject);
 
   sunLabelObject.position.set(0, 1.6, 0);
@@ -223,7 +223,6 @@ export function initScene() {
   /* Dette er en objekt som vi gør brug af til at ændre vores GUI med. Den har burg for visse informationer */
   animateParams = {
     earthSpeed: 10,
-    earthRotationSpeed: 1,
     lightIntensity: 50,
     aroundSunDirection: 1,
     rotationDirection: () => {
@@ -246,8 +245,7 @@ export function updateScene() {
 
   /* Mapper earthRotationSpeed fra et interval mellem 1 og 100 til 0.003 - 0.15.*/
   const mappedRotationSpeed =
-    ((animateParams.earthRotationSpeed - 0.003) * (0.15 - 0.003)) / (100 - 1) +
-    0.003;
+    ((10 - 0.003) * (0.15 - 0.003)) / (100 - 1) + 0.003;
   /* Henter hvor meget tid der er gået siden sidste frame. En frame vil bare være, sidste billede som renderen lavede */
   const deltaTime = clock.getDelta();
   /* Opdaterer den samlede tid baseret på hastighed og rotationsretning. Dette gør skift i hastighed og rotationretning
@@ -275,10 +273,6 @@ til at blive vist på en mere realistisk måde */
   const speedLabel = earthLabelElement.querySelector(".hastighed");
   if (speedLabel) {
     speedLabel.innerText = `Hastighed: ${animateParams.earthSpeed}`;
-  }
-  const selvHastighed = earthLabelElement.querySelector(".selv-hastighed");
-  if (selvHastighed) {
-    selvHastighed.innerText = `Hastighed selv: ${animateParams.earthRotationSpeed}`;
   }
   const rotationLabel = earthLabelElement.querySelector(".rotation");
   if (rotationLabel) {
