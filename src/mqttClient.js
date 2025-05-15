@@ -159,6 +159,7 @@ function handleToggle(r, animateParams) {
 function sendToLED(hex, command) {
   client.publish(command, `${hex}`);
   console.log("sent to LED");
+  console.log("And here is the other:" + hex);
 }
 
 function sendToMotor(speed, dir) {
@@ -182,7 +183,7 @@ function handleButton(message, animateParams) {
   const { r, g, b } = currentRGB;
   const xy = rgbToXy(r, g, b);
   const hex = rgbToHexWithBrightness(r, g, b, bri);
-  console.log(hex);
+  console.log("the hex is:" + hex);
 
   const lightPayload = {
     on: true,

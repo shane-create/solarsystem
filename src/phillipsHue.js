@@ -34,7 +34,7 @@ export function rgbToHexWithBrightness(r, g, b, brightness) {
   // Map brightness 30–200 → 0–255
   const clampedBrightness = Math.max(30, Math.min(200, brightness));
   const alpha = Math.round(((clampedBrightness - 30) / (200 - 30)) * 255);
-  const mappedAlpha = ((alpha - 30) * (50 - 20)) / (200 - 30) + 20;
+  const mappedAlpha = Math.round(((alpha - 30) * (50 - 20)) / (200 - 30) + 20);
 
   // Convert to hex
   const toHex = (val) => val.toString(16).padStart(2, "0");
