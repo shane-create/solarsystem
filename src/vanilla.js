@@ -1,3 +1,5 @@
+import { setBri } from "./mqttClient";
+import { setCurrentRGB } from "./phillipsHue";
 const base = import.meta.env.BASE_URL;
 
 /* Her henter vi en masse html elementer */
@@ -9,6 +11,7 @@ const menu = document.querySelector(".menu");
 const presetSaver = document.querySelector(".preset-saver");
 const saveButton = document.getElementById("saveButton");
 const inputField = document.getElementById("preset-input");
+const info = document.querySelector(".information");
 
 /* Vi laver såvel som expoterer en masse variabler så de kan bruges i main.js. Når man eksporter et varibel,
 og så ændrer på den lokalt, vil ændringerne også finde sted, i alle andre filer hvor den bruges */
@@ -24,6 +27,7 @@ export function toggleMenu() {
   menu.classList.toggle("active");
   presetsContainer.classList.toggle("active");
   title.classList.toggle("active");
+  info.classList.toggle("active");
 }
 
 /* Toggle pop up gør det samme. Vi har dem separeret, da vi gerne vil toggle disse ved forskellige tidspunkter */
@@ -53,6 +57,9 @@ export function loadSong() {
 }
 
 export function setValues(presetParams, animateParams) {
+  setBri(presetParams.ambientLightIntensity);
+
+  setCurrentRGB(presetParams.ambientColor);
   animateParams.aroundSunDirection = presetParams.rotationDirection;
   animateParams.earthSpeed = presetParams.earthSpeed;
   animateParams.lightIntensity = presetParams.lightIntensity;

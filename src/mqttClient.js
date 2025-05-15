@@ -11,10 +11,14 @@ import {
 export const url = "mqtt://mqtt-plain.nextservices.dk:9001";
 let sunOn = true;
 let client = null;
-let bri = 150;
+export let bri = 150;
 let col = 0;
 const songNum = document.querySelector(".sang-num");
 const amBright = document.querySelector(".am-bright");
+
+export function setBri(newBri) {
+  bri = newBri;
+}
 
 export function initMQTT(url, animateParams) {
   if (client) return client;
@@ -206,14 +210,4 @@ function handleButton(message, animateParams) {
     ((animateParams.earthSpeed - 10) * (10 - 1)) / (100 - 10) + 1;
 
   sendToMotor(mappedSpeed, animateParams.aroundSunDirection);
-  /*const msg = message;
-  client.publish(
-    "ESPStepper1/Motor",
-    JSON.stringify(msg),
-    { qos: 0 },
-    (err) => {
-      if (err) console.error("Publish error:", err);
-      else console.log("▶️ Motor command sent");
-    }
-  );*/
 }

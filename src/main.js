@@ -5,7 +5,8 @@ import "./firebase.js";
 import "./dataSave.js";
 import { initScene, updateScene, toggleVisible } from "./three.js";
 import { fetchData, savePreset, savedPresets } from "./dataSave.js";
-import { initMQTT, url } from "./mqttClient.js";
+import { currentRGB } from "./phillipsHue.js";
+import { initMQTT, url, bri } from "./mqttClient.js";
 import {
   toggleMenu,
   togglePopUp,
@@ -98,12 +99,12 @@ saveButton.addEventListener("click", async () => {
   if (inputValue.length > 0) {
     await savePreset(
       inputValue,
-      animateParams.volume,
       key,
       animateParams.earthSpeed,
-      animateParams.earthRotationSpeed,
+      currentRGB,
       animateParams.lightIntensity,
-      animateParams.aroundSunDirection
+      animateParams.aroundSunDirection,
+      bri
     );
     await fetchData();
     /* Inputens værdi sættes til tom. */

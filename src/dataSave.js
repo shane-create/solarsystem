@@ -23,21 +23,21 @@ export async function fetchData() {
 //of the motors to the firebase database.
 export async function savePreset(
   name,
-  volume,
-  song,
+  songNum,
   earthSpeed,
-  earthRotationSpeed,
+  ambientColor,
   lightIntensity,
-  rotationDirection
+  rotationDirection,
+  ambientLightIntensity
 ) {
   let savedPreset = {
     name: name,
-    volume: volume,
-    songNum: song,
+    songNum: songNum,
     earthSpeed: earthSpeed,
-    earthRotationSpeed: earthRotationSpeed,
+    ambientColor: ambientColor,
     lightIntensity: lightIntensity,
     rotationDirection: rotationDirection,
+    ambientLightIntensity: ambientLightIntensity,
   };
   const docRef = doc(db, "reload", "presets");
   try {

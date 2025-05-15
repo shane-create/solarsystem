@@ -87,6 +87,11 @@ body {
   font-size: 30px;
   padding-right: 30px;
   border-bottom: 3px solid #2cc9ff; /* Blue underline */
+  visibility: visible;
+}
+
+.information.active {
+  visibility: hidden;
 }
 
 .information p {
