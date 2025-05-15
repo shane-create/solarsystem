@@ -24,6 +24,23 @@ export function rgbToXy(r, g, b) {
   return [x || 0, y || 0];
 }
 
+export function rgbToHexWithBrightness(r, g, b, brightness) {
+  // Clamp RGB
+  const clamp = (val) => Math.max(0, Math.min(255, val));
+  r = clamp(r);
+  g = clamp(g);
+  b = clamp(b);
+
+  // Map brightness 30–200 → 0–255
+  const clampedBrightness = Math.max(30, Math.min(200, brightness));
+  const alpha = Math.round(((clampedBrightness - 30) / (200 - 30)) * 255);
+
+  // Convert to hex
+  const toHex = (val) => val.toString(16).padStart(2, "0");
+  const hex = `#${toHex(r)}${toHex(g)}${toHex(b)}${toHex(alpha)}`;
+
+  return hex;
+}
 // Send update to Philips Hue
 export function setLight(data, command, lightNum) {
   const path = `${url + lightNum}/${command}`;

@@ -1,6 +1,12 @@
 import mqtt from "mqtt";
 import { setKey, key, loadSong } from "./vanilla";
-import { currentRGB, rgbToXy, setLight, changeGradCol } from "./phillipsHue";
+import {
+  currentRGB,
+  rgbToXy,
+  rgbToHexWithBrightness,
+  setLight,
+  changeGradCol,
+} from "./phillipsHue";
 
 export const url = "mqtt://mqtt-plain.nextservices.dk:9001";
 let sunOn = true;
@@ -8,6 +14,7 @@ let client = null;
 let bri = 150;
 let col = 0;
 const songNum = document.querySelector(".sang-num");
+const amBright = document.querySelector(".am-bright");
 
 export function initMQTT(url, animateParams) {
   if (client) return client;
@@ -103,10 +110,15 @@ function handleKnob(r, animateParams) {
     if (r.Direction == 1) {
       if (bri < 200) {
         bri += 10;
+        const mappedBri = Math.round(((bri - 30) * (100 - 5)) / (200 - 30) + 5);
+        console.log(mappedBri);
+        amBright.innerHTML = "Ambient Brightness: " + mappedBri;
       }
     } else {
       if (bri > 30) {
         bri -= 10;
+        const mappedBri = Math.round(((bri - 30) * (100 - 5)) / (200 - 30) + 5);
+        amBright.innerHTML = "Ambient Brightness: " + mappedBri;
       }
     }
   }
@@ -127,9 +139,6 @@ function handleKnob(r, animateParams) {
 
 function handleToggle(r, animateParams) {
   if (r.ID == 1) {
-    animateParams.aroundSunDirection *= -1;
-  }
-  if (r.ID == 2) {
     if (sunOn) {
       animateParams.lightIntensity = 0;
       sunOn = !sunOn;
@@ -138,11 +147,38 @@ function handleToggle(r, animateParams) {
       sunOn = !sunOn;
     }
   }
+  if (r.ID == 2) {
+    animateParams.aroundSunDirection *= -1;
+  }
+}
+
+function sendToLED(hex, command) {
+  client.publish(command, `${hex}`);
+  console.log("sent to LED");
+}
+
+function sendToMotor(speed, dir) {
+  let actualDir;
+  if (dir == 1) {
+    actualDir = dir;
+  } else {
+    actualDir = 0;
+  }
+
+  let message = {
+    Steps: "Run",
+    Speed: speed,
+    Dir: actualDir,
+    MicroSteps: 32,
+  };
+  client.publish("ESPStepper1/Motor", JSON.stringify(message));
 }
 
 function handleButton(message, animateParams) {
   const { r, g, b } = currentRGB;
   const xy = rgbToXy(r, g, b);
+  const hex = rgbToHexWithBrightness(r, g, b, bri);
+  console.log(hex);
 
   const lightPayload = {
     on: true,
@@ -159,10 +195,17 @@ function handleButton(message, animateParams) {
   };
 
   loadSong();
+  sendToLED(hex, "Star3/Command");
+  sendToLED(hex, "Star4/Command");
 
   // Send to Hue Hub
   setLight(lightPayload, "state", 13);
   setLight(secondLight, "state", 2);
+
+  const mappedSpeed =
+    ((animateParams.earthSpeed - 10) * (10 - 1)) / (100 - 10) + 1;
+
+  sendToMotor(mappedSpeed, animateParams.aroundSunDirection);
   /*const msg = message;
   client.publish(
     "ESPStepper1/Motor",

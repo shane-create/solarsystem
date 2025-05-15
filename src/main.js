@@ -74,6 +74,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   await fetchData();
   loadPresets();
   console.log("loaded");
+  const fullscreenBtn = document.getElementById("fullscreen-btn");
+
+  fullscreenBtn.addEventListener("click", () => {
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen();
+    } else if (document.documentElement.webkitRequestFullscreen) {
+      // Safari
+      document.documentElement.webkitRequestFullscreen();
+    } else if (document.documentElement.msRequestFullscreen) {
+      // IE/Edge
+      document.documentElement.msRequestFullscreen();
+    }
+    // Remove the button from the DOM
+    fullscreenBtn.remove();
+  });
 });
 
 /* Her tilføjer vi en eventlistener til saveknappen. Den skal i virkeligheden kunne gemme dette data på firebase,
