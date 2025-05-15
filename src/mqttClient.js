@@ -112,12 +112,12 @@ function handleKnob(r, animateParams) {
   if (r.ID == 5) {
     if (r.Direction == 1) {
       if (col < 100) {
-        col += 1;
+        col += 10;
         changeGradCol(col);
       }
     } else {
       if (col > 0) {
-        col -= 1;
+        col -= 10;
         changeGradCol(col);
       }
     }
